@@ -1,0 +1,84 @@
+{
+    "database": {
+        "path": "trade_anomalies.db",
+        "backup_path": "trade_anomalies_backup.db",
+        "backup_interval_hours": 24
+    },
+    "models": {
+        "isolation_forest": {
+            "contamination": 0.05,
+            "n_estimators": 200,
+            "max_samples": "auto",
+            "random_state": 42
+        },
+        "autoencoder": {
+            "encoding_dim": 32,
+            "hidden_layers": [128, 64],
+            "epochs": 100,
+            "batch_size": 32,
+            "validation_split": 0.2,
+            "early_stopping_patience": 10
+        },
+        "dbscan": {
+            "eps": 0.5,
+            "min_samples": 5,
+            "metric": "euclidean"
+        }
+    },
+    "thresholds": {
+        "pnl_zscore": 3.0,
+        "volume_multiplier": 2.5,
+        "latency_percentile": 99,
+        "correlation_break": 0.3,
+        "concentration_limit": 0.25,
+        "slippage_threshold": 0.005,
+        "market_impact_threshold": 0.01
+    },
+    "scheduling": {
+        "detection_interval_minutes": 5,
+        "model_retrain_hours": 24,
+        "daily_run_time": "09:00",
+        "timezone": "US/Eastern",
+        "enabled": true
+    },
+    "alerts": {
+        "email": {
+            "enabled": false,
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "from_address": "alerts@tradingfirm.com",
+            "to_addresses": ["risk@tradingfirm.com", "compliance@tradingfirm.com"]
+        },
+        "slack": {
+            "enabled": false,
+            "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+        }
+    },
+    "data_sources": {
+        "trades": {
+            "type": "database",
+            "connection_string": "postgresql://user:pass@localhost/trades",
+            "table": "trades",
+            "real_time": true
+        },
+        "pnl": {
+            "type": "file",
+            "path": "/data/pnl/",
+            "format": "csv",
+            "watch_directory": true
+        }
+    },
+    "performance": {
+        "max_threads": 8,
+        "chunk_size": 10000,
+        "cache_size_mb": 1024,
+        "enable_gpu": false
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "trade_anomaly_detection.log",
+        "max_size_mb": 100,
+        "backup_count": 10,
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    }
+}
